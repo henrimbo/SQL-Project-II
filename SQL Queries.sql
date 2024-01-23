@@ -1,10 +1,10 @@
- #Seleção de corridas com duração maior que 1200 segundos e com gorjeta:
+ -- # Selecting trips with duration over 1200 seconds and with tips: 
 
  SELECT * 
  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
  WHERE trip_seconds > 1200 AND tips > 0 
 
- #Quantidade de corridas com pedágio, agrupadas por companhia e mês/ano da corrida:
+-- # Count of trips with tolls, grouped by company and specific date: 
 
  SELECT company, FORMAT_TIMESTAMP('%y-%m-%d', trip_start_timestamp) AS data_trip, 
    COUNT (unique_key) AS Total_trips
@@ -12,7 +12,7 @@
  WHERE tolls > 0 AND FORMAT_TIMESTAMP('%y-%m-%d', trip_start_timestamp) = '15-08-21'
  GROUP BY company, data_trip
 
- # Quantidade de corridas por ano e por companhia:
+-- # Count of trips per year for a specific company:
 
  SELECT company, EXTRACT(YEAR FROM trip_start_timestamp) as Year, COUNT (unique_key) AS Total_trips
  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
@@ -21,29 +21,21 @@
  ORDER BY Year DESC
 
 
- # Análise do preço das corridas ao longo dos anos
+-- # Analysing the average price of the trips over the year
 
  SELECT EXTRACT(YEAR FROM trip_start_timestamp) AS year, AVG(fare) AS average_fare
  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
  GROUP BY year
 
- # Análise da evolução do número de corridas e milhas percorridas por companhia ao longo dos anos
 
- # Para o número de corridas:
-
- SELECT company, EXTRACT(YEAR FROM trip_start_timestamp) AS year, COUNT(unique_key) AS total_trips
- FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
- GROUP BY company, year
-
-
- # Para milhas percorridas:
+ -- # Analysing the total miles of the trips by year and company. 
 
  SELECT company, EXTRACT(YEAR FROM trip_start_timestamp) AS year, SUM(trip_miles) AS total_miles
  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
  GROUP BY company, year
  ORDER BY company, year
 
- # Percentual por tipo de pagamento, agrupado por ano e companhia:
+ -- # Analysing the payment type by year and company
 
  SELECT 
    company, 
@@ -54,7 +46,7 @@
  GROUP BY company, year, payment_type
 
 
- # Coluna condicional de faixa de valores e análise de forma de pagamento por faixa de valor:
+ -- # Conditional column for fare ranges and analysis of payment type by fare range:
 
  SELECT *, 
    CASE 
@@ -66,7 +58,7 @@
    payment_type
  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
 
- # Análise do preço da viagem por companhia com filtro de quantidade de milhas: 
+ -- # Analysing the average price of the trips with a distance above 10 miles
 
  SELECT company, 
    AVG(fare) AS average_fare
@@ -74,7 +66,7 @@
  WHERE trip_miles > 10
  GROUP BY company
 
- # Ticket médio, quantidade de milhas percorridas, quantidade de viagens e horas viajadas por ano e companhia:
+ -- # Analysing average price, distance, quantity (number of trips), time of trips by year and company.  
 
  SELECT 
    company, 
@@ -86,8 +78,3 @@
  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
  GROUP BY company, year
 
- SELECT company, EXTRACT(YEAR FROM trip_start_timestamp) AS Year, sum(fare) / sum(trip_miles) as avg_fare_mile
- FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
- WHERE trip_miles > 0 AND company = 'Taxi Affiliation Services' AND EXTRACT(YEAR FROM trip_start_timestamp) > 2014
- GROUP BY company, Year
- ORDER BY Year DESC
